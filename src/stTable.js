@@ -49,11 +49,21 @@ ng.module('smart-table')
             });
         }
         var collectionAll = [];
-        $scope.$watch(propertyName, function () {
+        var displayedFirst = true;
+        $scope.$watch(propertyName, function (newL,oldV) {
             if (!collectionAll || collectionAll.length === 0 || collectionAll.length === 1) {
                 collectionAll = $scope[propertyName].slice(0);
+                displayedFirst = true;
+            }
+            if(newL.length === collectionAll.length) {
+                displayedFirst = true;
             }
             safeCopy = collectionAll;
+            if(safeCopy && tableState.pagination.number && safeCopy.length > tableState.pagination.number
+                && tableState.pagination.start === 0 && displayedFirst) {
+                displayedFirst = false;
+                ctrl.pipe();
+            }
         })
         /**
          * sort the rows
@@ -133,6 +143,7 @@ ng.module('smart-table')
         this.slice = function splice(start, number) {
             tableState.pagination.start = start;
             tableState.pagination.number = number;
+            displayedFirst = false;
             return this.pipe();
         };
 
