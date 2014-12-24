@@ -7,6 +7,9 @@ ng.module('smart-table')
         var orderBy = $filter('orderBy');
         var filter = $filter('filter');
         var safeCopy = copyRefs(displayGetter($scope));
+        $scope.$watch(propertyName,function(){
+            safeCopy = [].concat($scope[propertyName]);
+        })
         var tableState = {
             sort: {},
             search: {},
