@@ -18,9 +18,6 @@ ng.module('smart-table')
         var orderBy = $filter('orderBy');
         var filter = $filter('filter');
         var safeCopy = copyRefs(displayGetter($scope));
-        $scope.$watch(propertyName,function(){
-            safeCopy = [].concat($scope[propertyName]);
-        })
         var tableState = {
             sort: {},
             search: {},
@@ -62,7 +59,13 @@ ng.module('smart-table')
                 }
             });
         }
-
+        var collectionAll = [];
+        $scope.$watch(propertyName, function () {
+            if (!collectionAll || collectionAll.length === 0 || collectionAll.length === 1) {
+                collectionAll = $scope[propertyName].slice(0);
+            }
+            safeCopy = collectionAll;
+        })
         /**
          * sort the rows
          * @param {Function | String} predicate - function or string which will be used as predicate for the sorting
@@ -98,6 +101,7 @@ ng.module('smart-table')
          */
         this.pipe = function pipe() {
             var pagination = tableState.pagination;
+            safeCopy = collectionAll && collectionAll.length > 1 ? collectionAll : safeCopy;
             var filtered = tableState.search.predicateObject ? filter(safeCopy, tableState.search.predicateObject) : safeCopy;
             if (tableState.sort.predicate) {
                 filtered = orderBy(filtered, tableState.sort.predicate, tableState.sort.reverse);
